@@ -1,5 +1,7 @@
 # Ranking vivo de proyectos
 
+**Proyecto activo:** (ninguno)
+
 **Ejecución:** 2026-10-06 (primera ejecución; todos los Δ = "nuevo")
 
 > Nota de método: las fechas de las fuentes son la fecha de consulta (2026-10-06); los buscadores no devolvieron fecha de publicación fiable. La evidencia de demanda Latam es escasa: se puntúa conservadoramente.
