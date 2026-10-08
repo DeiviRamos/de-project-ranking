@@ -1,6 +1,6 @@
 # Ranking vivo de proyectos
 
-**Proyecto activo:** (ninguno)
+**Proyecto activo:** CDC Retail Orquestado
 
 **Ejecución:** 2026-10-07 (segunda ejecución; Δ contra el ranking del 2026-10-06)
 
