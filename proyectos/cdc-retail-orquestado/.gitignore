@@ -1,0 +1,13 @@
+.env
+*.env.local
+__pycache__/
+*.pyc
+.venv/
+venv/
+.dbt/
+target/
+dbt_packages/
+logs/
+*.log
+pgdata/
+.DS_Store

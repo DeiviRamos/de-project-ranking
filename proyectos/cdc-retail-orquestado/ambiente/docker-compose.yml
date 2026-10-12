@@ -1,0 +1,99 @@
+name: cdc-retail
+
+services:
+  postgres-fuente:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${SRC_DB}
+      POSTGRES_USER: ${SRC_USER}
+      POSTGRES_PASSWORD: ${SRC_PASSWORD}
+      CDC_USER: ${CDC_USER}
+      CDC_PASSWORD: ${CDC_PASSWORD}
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+      - -c
+      - max_replication_slots=10
+      - -c
+      - max_wal_senders=10
+    ports:
+      - "${SRC_PORT:-5432}:5432"
+    volumes:
+      - fuente_data:/var/lib/postgresql/data
+      - ./sql/01_ddl.sql:/docker-entrypoint-initdb.d/01_ddl.sql:ro
+      - ./sql/02_replicacion.sh:/docker-entrypoint-initdb.d/02_replicacion.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SRC_USER} -d ${SRC_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Destino vacío para que el usuario construya sus capas.
+  postgres-dwh:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DWH_DB}
+      POSTGRES_USER: ${DWH_USER}
+      POSTGRES_PASSWORD: ${DWH_PASSWORD}
+    ports:
+      - "${DWH_PORT:-5433}:5432"
+    volumes:
+      - dwh_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DWH_USER} -d ${DWH_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Broker únicamente: sin conectores ni consumidores.
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.1.7
+    command:
+      - redpanda
+      - start
+      - --mode=dev-container
+      - --smp=1
+      - --memory=1G
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:${REDPANDA_KAFKA_PORT:-19092}
+    ports:
+      - "${REDPANDA_KAFKA_PORT:-19092}:19092"
+    volumes:
+      - redpanda_data:/var/lib/redpanda/data
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -q 'Healthy:.*true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # Simulador de tráfico. No arranca con `up`; se invoca con `run` (perfil "sim").
+  simulador:
+    profiles: ["sim"]
+    build: ./generador
+    depends_on:
+      postgres-fuente:
+        condition: service_healthy
+    environment:
+      SIM_DB_HOST: postgres-fuente
+      SIM_DB_PORT: "5432"
+      SIM_DB_NAME: ${SRC_DB}
+      SIM_DB_USER: ${SRC_USER}
+      SIM_DB_PASSWORD: ${SRC_PASSWORD}
+      SIM_SEED: ${SIM_SEED:-42}
+      SIM_SCALE: ${SIM_SCALE:-1}
+      SIM_EPS: ${SIM_EPS:-5}
+      SIM_DURATION_S: ${SIM_DURATION_S:-120}
+      SIM_DEFECT_PCT: ${SIM_DEFECT_PCT:-5}
+      SIM_SCHEMA_CHANGE_AT: ${SIM_SCHEMA_CHANGE_AT:-500,1500}
+      SIM_SPIKE_EVERY_S: ${SIM_SPIKE_EVERY_S:-60}
+      SIM_SPIKE_FACTOR: ${SIM_SPIKE_FACTOR:-10}
+      SIM_SPIKE_LEN_S: ${SIM_SPIKE_LEN_S:-8}
+      SIM_OUTAGE_AT_S: ${SIM_OUTAGE_AT_S:-0}
+      SIM_OUTAGE_LEN_S: ${SIM_OUTAGE_LEN_S:-20}
+      SIM_BASE_DATE: ${SIM_BASE_DATE:-2026-09-01}
+
+volumes:
+  fuente_data:
+  dwh_data:
+  redpanda_data:
