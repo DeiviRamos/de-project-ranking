@@ -41,7 +41,7 @@ Por variable de entorno (en `.env`) o argumento (`docker compose run --rm simula
 | SIM_SEED | --seed | 42 | Semilla; misma semilla y mismo estado inicial => misma secuencia de operaciones |
 | SIM_SCALE | --scale | 1 | Factor xN: multiplica el volumen inicial (`init`) y la tasa de `run` |
 | SIM_EPS | --eps | 5 | Transacciones por segundo (antes de escalar) |
-| SIM_DURATION_S | --duration | 120 | Duración de `run` en segundos (0 = infinito) |
+| SIM_DURATION_S | --duration | 300 | Duración de `run` en segundos (0 = infinito) |
 | SIM_DEFECT_PCT | --defect-pct | 5 | Porcentaje de operaciones con imperfecciones; 0 desactiva también las irregularidades estructurales |
 | SIM_SCHEMA_CHANGE_AT | --schema-changes | 500,1500 | Transacciones acumuladas en las que ocurren cambios de esquema en la fuente (vacío = ninguno) |
 | SIM_SPIKE_EVERY_S / _FACTOR / _LEN_S | --spike-* | 60 / 10 / 8 | Picos periódicos de tráfico |
