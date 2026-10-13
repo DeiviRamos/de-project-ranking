@@ -324,7 +324,7 @@ def main():
     ap.add_argument("--seed", type=int, default=int(env("SIM_SEED", "42")))
     ap.add_argument("--scale", type=int, default=int(env("SIM_SCALE", "1")), help="factor xN de volumen y tasa")
     ap.add_argument("--eps", type=float, default=float(env("SIM_EPS", "5")), help="transacciones por segundo")
-    ap.add_argument("--duration", type=float, default=float(env("SIM_DURATION_S", "120")), help="0 = infinito")
+    ap.add_argument("--duration", type=float, default=float(env("SIM_DURATION_S", "300")), help="0 = infinito")
     ap.add_argument("--defect-pct", type=float, default=float(env("SIM_DEFECT_PCT", "5")))
     ap.add_argument("--schema-changes", default=env("SIM_SCHEMA_CHANGE_AT", "500,1500"),
                     help="ops acumuladas donde ocurre cada cambio de esquema; vacío = ninguno")
