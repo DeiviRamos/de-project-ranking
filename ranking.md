@@ -2,19 +2,19 @@
 
 **Proyecto activo:** CDC Retail Orquestado
 
-**Ejecución:** 2026-10-07 (segunda ejecución; Δ contra el ranking del 2026-10-06)
+**Ejecución:** 2026-11-09 (Δ contra el ranking del 2026-10-07)
 
-> Nota de método: las fechas de las fuentes son la fecha de consulta (2026-10-07). Esta semana los sitios de blogs de ingeniería (Netflix, Uber, Airbnb, Medium) no pudieron abrirse desde el entorno (bloqueo de red); los enlaces de blogs primarios provienen de resultados de búsqueda y NO se pudo leer el texto completo ni confirmar su fecha de publicación. La evidencia Latam sigue siendo escasa y se puntúa conservadoramente.
+> Nota de método: las fechas de las fuentes son la fecha de consulta (2026-11-09) salvo que se indique otra. Esta semana el dominio www.uber.com no resolvió desde el entorno (debería permitirse en la configuración de red de la sesión); los enlaces primarios de Uber y Netflix siguen sin verificarse en contenido ni fecha. Las ofertas Latam se obtuvieron vía buscador y agregadores; no se confirmó que sigan abiertas.
 
 ## Top 5
 
 | # | Proyecto | Dominio | Carga | Total | Δ |
 |---|----------|---------|-------|-------|---|
-| 1 | CDC Retail Orquestado | Retail/e-commerce | CDC | 4.45 | = (0) |
-| 2 | Telemetría de Flota en Vivo | Movilidad | Streaming | 3.75 | ▲1 |
-| 3 | Torre de Control Logística (provisional: sin fuente primaria) | Logística | Consumo de API | 3.75 | ▼1 |
-| 4 | Sensores Industriales en Series de Tiempo (provisional: sin fuente primaria) | IoT/industria | Streaming | 3.60 | ▲1 |
-| 5 | Observatorio de Calidad Clínica | Salud | Batch | 3.50 | ▼1 |
+| 1 | CDC Retail Orquestado | Retail/e-commerce | CDC | 4.45 | = |
+| 2 | Telemetría de Flota en Vivo | Movilidad | Streaming | 3.85 | = |
+| 3 | Torre de Control Logística (provisional: sin fuente primaria) | Logística | Consumo de API | 3.75 | = |
+| 4 | Sensores Industriales en Series de Tiempo (provisional: sin fuente primaria) | IoT/industria | Streaming | 3.70 | = |
+| 5 | Observatorio de Calidad Clínica | Salud | Batch | 3.50 | = |
 
 Variedad: top 3 con dominios distintos (retail, movilidad, logística); 4 tipos de carga en el top 5 (CDC, streaming, API, batch). Solo 3 proyectos (#1, #2, #5) tienen fuente primaria; los otros dos completan el top 5 como provisionales.
 
@@ -44,11 +44,11 @@ Variedad: top 3 con dominios distintos (retail, movilidad, logística); 4 tipos 
 
 ## Fichas resumidas #2–#5
 
-**#2 Telemetría de Flota en Vivo** (Movilidad, streaming; reto: latencia). Feed de posiciones de vehículos (datos abiertos de transporte) por Redpanda, consumidores en Python y agregación por ventanas de tiempo y celdas geográficas en Postgres. Puntajes: huecos 4 | portafolio 4 | demanda 2.5 (Latam 2 por **sin evidencia** / global 3, solo fuentes de terceros) | dificultad 5 | reutilización 3 → **3.75**. Desafío real: agregar eventos de conductores y pasajeros por celda geográfica y ventana de un minuto en tiempo casi real, con suavizado espacial. Fuente primaria (Uber Engineering, sin leer en completo): https://www.uber.com/en-MY/blog/building-scalable-streaming-pipelines (consultado 2026-10-07).
+**#2 Telemetría de Flota en Vivo** (Movilidad, streaming; reto: latencia). Feed de posiciones de vehículos (datos abiertos de transporte) por Redpanda, consumidores en Python y agregación por ventanas de tiempo y celdas geográficas en Postgres. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3: ofertas con Kafka/streaming en GetOnBoard y agregadores, ver abajo / global 3, solo fuentes de terceros) | dificultad 5 | reutilización 3 → **3.85**. Desafío real: agregar eventos de conductores y pasajeros por celda geográfica y ventana de un minuto en tiempo casi real, con suavizado espacial. Fuente primaria (Uber Engineering, sin leer en completo): https://www.uber.com/en-MY/blog/building-scalable-streaming-pipelines (consultado 2026-10-07).
 
 **#3 Torre de Control Logística (provisional: sin fuente primaria)** (Logística, consumo de API; reto: modelado). Ingesta periódica de APIs abiertas de envíos/clima/tráfico, orquestada con Dagster, modelo dimensional con snapshots de dbt y pruebas. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3 por ofertas dbt/Airflow citadas arriba / global 3, fuentes de terceros) | dificultad 3 | reutilización 5 → **3.75**. Desafío real: sin evidencia de blog primario específico; sigue pendiente.
 
-**#4 Sensores Industriales en Series de Tiempo (provisional: sin fuente primaria)** (IoT/industria, streaming; reto: volumen). Sensores simulados por Redpanda hacia Postgres con particionado y retención, vistas agregadas. Puntajes: huecos 4 | portafolio 4 | demanda 2.5 (Latam 2 por **sin evidencia** / global 3) | dificultad 4 | reutilización 3 → **3.60**. Desafío real: sin evidencia de blog primario; pendiente.
+**#4 Sensores Industriales en Series de Tiempo (provisional: sin fuente primaria)** (IoT/industria, streaming; reto: volumen). Sensores simulados por Redpanda hacia Postgres con particionado y retención, vistas agregadas. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3 por ofertas con Kafka en tiempo real / global 3) | dificultad 4 | reutilización 3 → **3.70**. Desafío real: sin evidencia de blog primario; pendiente.
 
 **#5 Observatorio de Calidad Clínica** (Salud, batch; reto: calidad de datos). Datos de salud abiertos o sintéticos con reglas de calidad por niveles (críticos vs. secundarios), pruebas dbt y CI que bloquea PRs. Puntajes: huecos 4 | portafolio 3 | demanda 3.0 (Latam 3 / global 3; calidad de datos en 43% de ofertas según https://www.thirstysprout.com/post/data-engineering-skills-required, fuente de terceros, consultada 2026-10-06) | dificultad 3 | reutilización 5 → **3.50**. Desafío real: clasificar datasets por niveles (tiers) con SLAs y checks estándar según criticidad. Fuente primaria (Uber Engineering, sin leer en completo): https://www.uber.com/blog/operational-excellence-data-quality/ (consultado 2026-10-07).
 
@@ -64,7 +64,12 @@ Sin re-puntuar a fondo esta semana: no hubo evidencia nueva que los afecte.
 
 ## Qué cambió esta semana y por qué
 
-- Se aplicó con más rigor la regla de fuentes de terceros: la demanda global pasó de 4 a 3 en todos los proyectos que solo la sustentaban con blogs de análisis. Esto bajó los totales (#1: 4.55 → 4.45).
+- Semana 2026-11-09: se encontró evidencia Latam concreta de streaming: Playbypoint "Data Engineer (Latam)" en GetOnBoard, con Kafka y Airflow, ya cerrada (https://www.getonbrd.com/jobs/data-science-analytics/data-engineer-remote-latam-playbypoint-remote, consultada 2026-11-09); 2BRAINS "Data Engineer Semi Senior" en GetOnBoard, con dbt deseable y tiempo real con Kafka o Kinesis (https://www.getonbrd.com/empleos/data-science-analytics/data-engineer-semi-senior-2brains-remote-72b9, consultada 2026-11-09); y un puesto senior remoto Latam con Airflow, dbt y Kafka/Kinesis en agregador (https://remotejobs.lat/es/job-offers/45660-senior-data-engineer, consultada 2026-11-09). Con ello Latam sube de 2 a 3 en #2 y #4 (Telemetría 3.75 → 3.85; Sensores 3.60 → 3.70). #1 mantiene Latam 3: Dagster y Debezium siguen "sin evidencia" en Latam. La oferta de Ryzlabs usa Snowflake; se traduce a Postgres.
+- Global: un análisis de terceros de 6,877 ofertas (mayo 2026) y otro de Q1 2026 coinciden en que dbt y Airflow son los más frecuentes, Kafka se concentra en roles de streaming y Dagster crece en startups (https://dev.to/gnana_6392e836fd500a957dc/data-engineer-skills-companies-want-in-2026-6877-posting-analysis-44p9 y https://jobstrack.io/blog/roles/data-engineer, consultadas 2026-11-09; fuentes de terceros, sin cambio en puntajes globales).
+- Buenas prácticas oficiales: la guía de asset checks de Dagster recomienda una propiedad por check y bloquear dependientes con blocking=True (https://docs.dagster.io/guides/test/asset-checks, consultada 2026-11-09); aplica a la Fase 2 de #1.
+- Fuente primaria candidata sin asignar: DoorDash, sistema de eventos Iguazu con Kafka y Flink (https://doordash.engineering/2022/08/02/building-scalable-real-time-event-processing-with-kafka-and-flink/, consultada 2026-11-09; sin leer en completo). Ningún proyecto del pool la replica con fidelidad; no se asignó. Para IoT/industria no se halló blog primario de big tech (solo tutoriales de proveedores), y para logística la búsqueda tampoco arrojó uno específico.
+- Sin cambios en el orden del top 5; la banca no se re-puntuó.
+- Semana anterior (2026-10-07): se aplicó con más rigor la regla de fuentes de terceros: la demanda global pasó de 4 a 3 en todos los proyectos que solo la sustentaban con blogs de análisis. Esto bajó los totales (#1: 4.55 → 4.45).
 - Se encontraron ofertas Latam concretas (Muttdata, Ryzlabs) para dbt y Airflow; sostienen Latam = 3 en #1, #3 y #5. Kafka/Dagster en Latam siguen "sin evidencia".
 - Se añadieron fuentes primarias: #1 (DBLog de Netflix, artículo en arXiv, reemplaza el resumen de terceros), #2 (Uber, streaming geoespacial) y #5 (Uber, calidad de datos). Con ello Telemetría de Flota sube a #2 y Calidad Clínica queda con fuente primaria.
 - Logística y Sensores siguen sin fuente primaria y se marcan provisionales; Calidad Clínica cae al #5 por score. Falta una fuente primaria para al menos dos proyectos más para cumplir el requisito del top 5.
