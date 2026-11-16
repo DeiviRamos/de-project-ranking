@@ -2,74 +2,73 @@
 
 **Proyecto activo:** CDC Retail Orquestado
 
-**Ejecución:** 2026-10-07 (segunda ejecución; Δ contra el ranking del 2026-10-06)
+**Ejecución:** 2026-11-16 (Δ contra el ranking del 2026-10-07)
 
-> Nota de método: las fechas de las fuentes son la fecha de consulta (2026-10-07). Esta semana los sitios de blogs de ingeniería (Netflix, Uber, Airbnb, Medium) no pudieron abrirse desde el entorno (bloqueo de red); los enlaces de blogs primarios provienen de resultados de búsqueda y NO se pudo leer el texto completo ni confirmar su fecha de publicación. La evidencia Latam sigue siendo escasa y se puntúa conservadoramente.
+> Nota de método: las fechas indicadas son la fecha de consulta (2026-11-16) salvo que se diga otra cosa. Desde el entorno no se pudieron abrir uber.com ni getonbrd.com (bloqueo de red); la evidencia proviene de resultados de búsqueda, sin leer el texto completo de las fuentes. Varias ofertas de GetOnBoard no muestran fecha de publicación en el resultado y algunas figuran cerradas. "CDC Retail Orquestado" pasó a ser el proyecto activo y se excluyó del pool.
 
 ## Top 5
 
 | # | Proyecto | Dominio | Carga | Total | Δ |
 |---|----------|---------|-------|-------|---|
-| 1 | CDC Retail Orquestado | Retail/e-commerce | CDC | 4.45 | = (0) |
-| 2 | Telemetría de Flota en Vivo | Movilidad | Streaming | 3.75 | ▲1 |
-| 3 | Torre de Control Logística (provisional: sin fuente primaria) | Logística | Consumo de API | 3.75 | ▼1 |
-| 4 | Sensores Industriales en Series de Tiempo (provisional: sin fuente primaria) | IoT/industria | Streaming | 3.60 | ▲1 |
-| 5 | Observatorio de Calidad Clínica | Salud | Batch | 3.50 | ▼1 |
+| 1 | Telemetría de Flota en Vivo | Movilidad | Streaming | 3.85 | ▲1 |
+| 2 | Libro Mayor y Conciliación | Finanzas | Batch/CDC | 3.75 | ▲4 |
+| 3 | Torre de Control Logística (provisional: sin fuente primaria) | Logística | Consumo de API | 3.75 | = (0) |
+| 4 | Integridad de Pagos en Streaming | Finanzas | Streaming | 3.70 | nuevo |
+| 5 | Observatorio de Calidad Clínica | Salud | Batch | 3.50 | = (0) |
 
-Variedad: top 3 con dominios distintos (retail, movilidad, logística); 4 tipos de carga en el top 5 (CDC, streaming, API, batch). Solo 3 proyectos (#1, #2, #5) tienen fuente primaria; los otros dos completan el top 5 como provisionales.
+Variedad: top 3 con dominios distintos (movilidad, finanzas, logística); 4 tipos de carga en el top 5 (streaming, batch, CDC, API). Cuatro proyectos (#1, #2, #4, #5) tienen fuente primaria; #3 completa el top 5 como provisional. Empate en 3.75: #2 queda delante de #3 por tener fuente primaria.
 
-## Ficha completa #1 — CDC Retail Orquestado
+## Ficha completa #1 — Telemetría de Flota en Vivo
 
-- **Dominio:** Retail/e-commerce
-- **Tipo de carga:** CDC (reto principal: evolución de esquema y calidad de datos)
-- **Resumen:** Una tienda en línea simulada opera sobre una base transaccional (pedidos, clientes, inventario). El negocio necesita analítica casi en tiempo real sin consultar la base operativa. El proyecto captura los cambios de esa base, los transporta por un bus de eventos y los modela en capas medallón con esquema dimensional (incluyendo historial de cambios), todo probado y orquestado.
-- **Stack:** Python, SQL, PostgreSQL, dbt, Docker, VPS, arquitectura medallón (dominados) + **Debezium (nuevo)**, **Redpanda (nuevo)**, **Dagster (nuevo)**, **GitHub Actions (nuevo)**, asset checks de Dagster (nuevo).
-- **Huecos que cierra:** streaming, orquestación, testing de datos, CI/CD, git con ramas y PRs, modelado dimensional (SCD).
+- **Dominio:** Movilidad
+- **Tipo de carga:** Streaming (reto principal: latencia)
+- **Resumen:** Un operador de transporte necesita saber, minuto a minuto, dónde hay concentración o falta de vehículos y cuánto se desvían de su horario. El proyecto ingiere posiciones de vehículos (feed abierto en formato GTFS-Realtime o un simulador), las transporta por un bus de eventos y produce agregados por ventana de tiempo y celda geográfica, con un modelo histórico para análisis.
+- **Stack:** Python, SQL, PostgreSQL, dbt, Docker, VPS, medallón (dominados) + **Redpanda (nuevo; se practica en el proyecto activo)**, **Dagster (nuevo)** para backfills y agregados diarios, **GitHub Actions (nuevo)**. Celdas geográficas con una grilla simple en SQL; una librería de índices hexagonales queda para una fase posterior, para no sumar una cuarta herramienta nueva.
+- **Huecos que cierra:** streaming (principal), SQL avanzado (funciones de ventana, agregación temporal), testing de datos (pruebas sobre eventos tardíos y duplicados), CI/CD, git con ramas y PRs; orquestación y modelado dimensional solo de forma parcial (por eso 4 y no 5).
 - **Pros:**
-  - Cubre 6 de los 7 huecos prioritarios en un solo proyecto.
-  - Extiende lo ya dominado (Postgres, dbt, medallón).
-  - Todo corre en Docker a costo cero; existe un lab oficial de referencia.
+  - Extiende directamente lo aprendido en el proyecto activo (Redpanda) hacia procesamiento por ventanas, que es el siguiente escalón de streaming.
+  - Problema fácil de explicar en entrevista (latencia, eventos fuera de orden, idempotencia) y con datos abiertos reales.
+  - Costo cero: todo corre en Docker local o en el VPS.
 - **Contras:**
-  - Más de 3 herramientas nuevas; por eso se propone Fase 1.
-  - Debezium requiere depurar replicación lógica de Postgres.
-  - Sin volumen real: la escala se demuestra de forma sintética.
-- **Puntajes (1-5):** Cierre de huecos 5 | Valor para portafolio 5 | Demanda 3.0 (Latam 3 / global 3) | Dificultad/aprendizaje 4 (sobre la Fase 1) | Reutilización del stack 5
-- **Total:** 5×0.30 + 5×0.25 + 3.0×0.20 + 4×0.15 + 5×0.10 = 1.50 + 1.25 + 0.60 + 0.60 + 0.50 = **4.45**
+  - Sin un motor de streaming dedicado, las ventanas se implementan en Python/Postgres; es una simplificación que hay que justificar en un ADR.
+  - Depende de la disponibilidad y calidad del feed abierto elegido; conviene tener un simulador de respaldo.
+  - Menor reutilización de dbt que los proyectos batch.
+- **Puntajes (1-5):** Cierre de huecos 4 | Valor para portafolio 4 | Demanda 3.0 (Latam 3 / global 3) | Dificultad/aprendizaje 5 | Reutilización del stack 3
+- **Total:** 4×0.30 + 4×0.25 + 3.0×0.20 + 5×0.15 + 3×0.10 = 1.20 + 1.00 + 0.60 + 0.75 + 0.30 = **3.85**
 - **Evidencia de demanda:**
-  - Latam: ofertas remotas para Latam que piden dbt y orquestación con Airflow, p. ej. Muttdata "Data Engineer Senior DBT" (https://jobs.lever.co/muttdata/dd6fe048-650e-417f-8669-3afafa7a8c6b/apply, consultada 2026-10-07) y Ryzlabs (dbt + Airflow, publicada 2026-07-07: https://jobera.com/job/ryzlabs-data-engineer-61df6ce2/, consultada 2026-10-07). Kafka/streaming, Dagster y Debezium en Latam: **sin evidencia** concreta (una búsqueda solo indica que "varias" ofertas mencionan Kafka, sin dato). Por eso Latam = 3.
-  - Latam (análisis previo, no re-verificado esta semana): 1,467 ofertas con CI/CD en 16.2% (https://bertonisolutions.com/blog/hiring-data-engineers-latam-2026, consultado 2026-10-06; fuente de terceros).
-  - Global: un análisis de ofertas 2026 reporta Airflow en 48%, Kafka en 41% y dbt en 33% (https://blog.dataengineerthings.org/stop-chasing-every-new-data-tool-here-is-the-real-data-engineering-stack-for-2026-bb7dcb131070, consultado 2026-10-06; **fuente de terceros**, por eso global baja de 4 a 3). Otra guía indica que Airflow y Kafka suelen aparecer como "preferidos" más que requeridos (https://www.thirstysprout.com/post/data-engineering-skills-required, consultado 2026-10-06; fuente de terceros).
-- **Desafío real que replica:** mantener sincronizadas bases heterogéneas capturando cambios del log de transacciones y, a la vez, poder reconstruir el estado completo de las tablas sin bloquear el origen. Fuente primaria (artículo de los autores de Netflix sobre DBLog, no leído en completo): https://arxiv.org/abs/2010.12597 (consultado 2026-10-07). Referencia técnica de implementación: https://docs.redpanda.com/labs/docker-compose/cdc-postgres-json.md
-- **Fase 1 (3 semanas):** Postgres transaccional simulado → Debezium → Redpanda → capa bronce en Postgres; capa plata y oro con dbt (dimensión con historial de cambios); pruebas dbt; GitHub Actions con ramas y PRs que ejecutan lint y pruebas; documentación y diagrama de arquitectura desde la semana 1. Dagster y asset checks pasan a Fase 2 (semana 4+).
+  - Latam: oferta remota de Coderslab.io en GetOnBoard (residencia en Chile, Perú o Colombia) que pide Kafka, Kafka Connect y procesos de streaming (https://www.getonbrd.com/jobs/data-science-analytics/data-engineer-coderslab-io-remote, consultada 2026-11-16; fecha de publicación no visible). Oferta de ingeniería con Kafka Streams y Kafka Connect de Wizeline en Colombia, publicada 2026-02-25 (https://hw.glich.co/jobboard/jobs/senior-kafka-software-engineer-at-wizeline-pbgn5h, consultada 2026-11-16; es un rol de software, no de datos puro). Orquestación con Airflow en ofertas de Santiago: 3IT (https://www.getonbrd.com/jobs/data-engineer-sr-3it-santiago) y Dynamic Devs (https://www.getonbrd.com/jobs/data-engineer-dynamic-devs-santiago), ambas consultadas 2026-11-16, sin fecha visible. Evidencia concreta pero escasa → Latam = 3.
+  - Global: oferta remota de Fountain que pide migrar a streaming con Kafka y Debezium y orquestar dbt con Dagster (https://dynamitejobs.com/company/fountain/remote-job/senior-data-engineer, consultada 2026-11-16, fecha no confirmada); oferta remota de PadSplit con Dagster, dbt y Kafka (https://www.workingnomads.com/jobs/data-engineer-fully-remote-padsplit, consultada 2026-11-16); un buscador de empleo listaba 13 ofertas remotas con Dagster en Reino Unido (https://www.itjobswatch.co.uk/find/Work-from-Home-Dagster-jobs, consultada 2026-11-16). La mayoría exige residencia en EE. UU. o Reino Unido y son casos puntuales, no estadística → global = 3.
+- **Desafío real que replica:** agregar eventos de vehículos por celda geográfica y ventana corta de tiempo en tiempo casi real, tolerando eventos tardíos. Fuentes primarias (no leídas en completo): Uber Engineering sobre pipelines de streaming escalables (https://www.uber.com/en-MY/blog/building-scalable-streaming-pipelines, consultada 2026-11-16) y DoorDash Engineering sobre su plataforma de eventos en tiempo real que publica agregados por ventana de tiempo (https://doordash.engineering/2022/08/02/building-scalable-real-time-event-processing-with-kafka-and-flink/, publicada 2022-08-02 según referencias secundarias). La escala se traduce a Redpanda + consumidores Python + Postgres, sin Flink.
+- **Fase 1:** no es obligatoria (3 herramientas nuevas). Alcance sugerido de 3 semanas: ingesta del feed a Redpanda → bronce en Postgres; agregados por ventana y celda con pruebas de duplicados y eventos tardíos; GitHub Actions con ramas y PRs; documentación y diagrama de arquitectura desde la semana 1. Dagster entra en la semana 3 para backfills.
 
 ## Fichas resumidas #2–#5
 
-**#2 Telemetría de Flota en Vivo** (Movilidad, streaming; reto: latencia). Feed de posiciones de vehículos (datos abiertos de transporte) por Redpanda, consumidores en Python y agregación por ventanas de tiempo y celdas geográficas en Postgres. Puntajes: huecos 4 | portafolio 4 | demanda 2.5 (Latam 2 por **sin evidencia** / global 3, solo fuentes de terceros) | dificultad 5 | reutilización 3 → **3.75**. Desafío real: agregar eventos de conductores y pasajeros por celda geográfica y ventana de un minuto en tiempo casi real, con suavizado espacial. Fuente primaria (Uber Engineering, sin leer en completo): https://www.uber.com/en-MY/blog/building-scalable-streaming-pipelines (consultado 2026-10-07).
+**#2 Libro Mayor y Conciliación** (Finanzas, batch/CDC; reto: modelado). Eventos de pagos simulados se convierten en un libro mayor de doble partida, modelado dimensionalmente con dbt y conciliado contra extractos bancarios sintéticos; las pruebas exigen que cada asiento cuadre y que las diferencias de conciliación queden explicadas. Reutiliza la captura de cambios del proyecto activo. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3 por ofertas con dbt/Airflow citadas arriba / global 3) | dificultad 3 | reutilización 5 → **3.75**. Desafío real: reemplazar un ETL nocturno que reconstruía la contabilidad a partir de registros de auditoría por un pipeline basado en eventos de movimiento de dinero. Fuente primaria (Airbnb Engineering, 2017, no leída en completo): https://medium.com/airbnb-engineering/6d742b80f040 (consultada 2026-11-16).
 
-**#3 Torre de Control Logística (provisional: sin fuente primaria)** (Logística, consumo de API; reto: modelado). Ingesta periódica de APIs abiertas de envíos/clima/tráfico, orquestada con Dagster, modelo dimensional con snapshots de dbt y pruebas. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3 por ofertas dbt/Airflow citadas arriba / global 3, fuentes de terceros) | dificultad 3 | reutilización 5 → **3.75**. Desafío real: sin evidencia de blog primario específico; sigue pendiente.
+**#3 Torre de Control Logística (provisional: sin fuente primaria)** (Logística, consumo de API; reto: modelado). Ingesta periódica de APIs abiertas de envíos, clima y tráfico, orquestada con Dagster, con historial de estados de envío vía snapshots de dbt y pruebas. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3 / global 3) | dificultad 3 | reutilización 5 → **3.75**. Desafío real: sin evidencia de blog primario; esta semana se buscó en Flexport, Shopify, Instacart y DoorDash y solo aparecieron documentación de API y fuentes de terceros.
 
-**#4 Sensores Industriales en Series de Tiempo (provisional: sin fuente primaria)** (IoT/industria, streaming; reto: volumen). Sensores simulados por Redpanda hacia Postgres con particionado y retención, vistas agregadas. Puntajes: huecos 4 | portafolio 4 | demanda 2.5 (Latam 2 por **sin evidencia** / global 3) | dificultad 4 | reutilización 3 → **3.60**. Desafío real: sin evidencia de blog primario; pendiente.
+**#4 Integridad de Pagos en Streaming** (Finanzas, streaming; reto: calidad de datos). Varios servicios simulados (checkout, pasarela, contabilidad) emiten eventos a Redpanda; un consumidor detecta pagos faltantes, duplicados o con montos distintos entre sistemas y publica métricas de integridad con SLA de detección. Puntajes: huecos 4 | portafolio 4 | demanda 3.0 (Latam 3 por ofertas Kafka / global 3) | dificultad 4 | reutilización 3 → **3.70**. Desafío real: medir la consistencia de transacciones entre sistemas de pago distribuidos. Fuente primaria (Airbnb Engineering, no leída en completo, fecha no confirmada): https://medium.com/airbnb-engineering/measuring-transactional-integrity-in-airbnbs-distributed-payment-ecosystem-a670d6926d22 (consultada 2026-11-16).
 
-**#5 Observatorio de Calidad Clínica** (Salud, batch; reto: calidad de datos). Datos de salud abiertos o sintéticos con reglas de calidad por niveles (críticos vs. secundarios), pruebas dbt y CI que bloquea PRs. Puntajes: huecos 4 | portafolio 3 | demanda 3.0 (Latam 3 / global 3; calidad de datos en 43% de ofertas según https://www.thirstysprout.com/post/data-engineering-skills-required, fuente de terceros, consultada 2026-10-06) | dificultad 3 | reutilización 5 → **3.50**. Desafío real: clasificar datasets por niveles (tiers) con SLAs y checks estándar según criticidad. Fuente primaria (Uber Engineering, sin leer en completo): https://www.uber.com/blog/operational-excellence-data-quality/ (consultado 2026-10-07).
+**#5 Observatorio de Calidad Clínica** (Salud, batch; reto: calidad de datos). Datos de salud abiertos o sintéticos con reglas de calidad por niveles (críticos vs. secundarios), pruebas dbt que bloquean la publicación de datos defectuosos y CI que bloquea PRs. Puntajes: huecos 4 | portafolio 3 | demanda 3.0 (Latam 3 / global 3) | dificultad 3 | reutilización 5 → **3.50**. Desafío real: clasificar datasets por criticidad con checks estándar (Uber, https://www.uber.com/blog/operational-excellence-data-quality/) y ejecutar checks dentro del pipeline antes de exponer los datos (Airbnb, https://medium.com/airbnb-engineering/how-airbnb-built-wall-to-prevent-data-bugs-ad1b081d6e8f); ambas fuentes primarias consultadas 2026-11-16, no leídas en completo.
 
 ## Banca (#6–#10)
 
-Sin re-puntuar a fondo esta semana: no hubo evidencia nueva que los afecte.
-
-6. Libro Mayor y Conciliación — Finanzas (batch/CDC; modelado y evolución de esquema) — **3.45**
-7. Medidores Inteligentes y Tarifas — Energía (batch; SQL avanzado, volumen) — **3.20**
-8. CDR Telecom con Evolución de Esquema — Telecom (streaming/batch; evolución de esquema) — **3.05**
-9. Monitor de Precios y Promociones — Retail/e-commerce (consumo de API; calidad de datos) — **2.75**
-10. Demanda Energética con APIs Abiertas — Energía (consumo de API; modelado) — **2.70**
+6. Sensores Industriales en Series de Tiempo — IoT/industria (streaming; volumen) — **3.70** (sin fuente primaria: solo contenido de proveedores)
+7. CDR Telecom con Evolución de Esquema — Telecom (streaming/batch; evolución de esquema) — **3.45**
+8. Medidores Inteligentes y Tarifas — Energía (batch; SQL avanzado, volumen) — **3.20**
+9. Monitor de Precios y Promociones — Retail/e-commerce (consumo de API; calidad de datos) — **2.80**
+10. Demanda Energética con APIs Abiertas — Energía (consumo de API; modelado) — **2.65**
 
 ## Qué cambió esta semana y por qué
 
-- Se aplicó con más rigor la regla de fuentes de terceros: la demanda global pasó de 4 a 3 en todos los proyectos que solo la sustentaban con blogs de análisis. Esto bajó los totales (#1: 4.55 → 4.45).
-- Se encontraron ofertas Latam concretas (Muttdata, Ryzlabs) para dbt y Airflow; sostienen Latam = 3 en #1, #3 y #5. Kafka/Dagster en Latam siguen "sin evidencia".
-- Se añadieron fuentes primarias: #1 (DBLog de Netflix, artículo en arXiv, reemplaza el resumen de terceros), #2 (Uber, streaming geoespacial) y #5 (Uber, calidad de datos). Con ello Telemetría de Flota sube a #2 y Calidad Clínica queda con fuente primaria.
-- Logística y Sensores siguen sin fuente primaria y se marcan provisionales; Calidad Clínica cae al #5 por score. Falta una fuente primaria para al menos dos proyectos más para cumplir el requisito del top 5.
-- Se agregó la Fase 1 de #1 (exigida por tener más de 3 herramientas nuevas).
-- Limitación: no se pudo abrir ningún blog de ingeniería; los enlaces primarios no están verificados en su contenido ni fecha. Pendiente para la próxima semana: verificarlos y buscar fuente primaria para Logística, Sensores y la banca.
+- "CDC Retail Orquestado" (el #1 anterior) es ahora el proyecto activo y salió del pool, lo que deja libre el #1; se agregó "Integridad de Pagos en Streaming" como reposición.
+- Apareció evidencia Latam concreta de Kafka/streaming (Coderslab.io en GetOnBoard, Wizeline en Colombia). Con eso, los proyectos de streaming pasan de Latam 2 a Latam 3: Telemetría de Flota sube a 3.85 y queda #1; CDR Telecom sube de 3.05 a 3.45.
+- La banca se re-puntuó a fondo con desglose explícito. "Libro Mayor y Conciliación" subió de 3.45 a 3.75 (huecos 4, portafolio 4) y consiguió fuente primaria (Airbnb), así que entra al top 5 en el #2.
+- "Sensores Industriales" cae al #6: sigue sin fuente primaria (las búsquedas solo dieron contenido de proveedores) y ya hay cuatro proyectos con fuente primaria que la desplazan. "Torre de Control Logística" se mantiene como el único provisional del top 5.
+- "Observatorio de Calidad Clínica" suma una segunda fuente primaria (Airbnb Wall).
+- Demanda global: hay ofertas remotas reales con Dagster + dbt + Kafka (Fountain, PadSplit), pero son casos puntuales y en su mayoría solo para residentes en EE. UU.; la demanda global sigue en 3.
+- Contexto del sector: Prefect anunció el 2026-07-13 la compra de Dagster Labs; según la prensa del sector, Dagster mantiene su nombre, su licencia open source y su hoja de ruta (https://thenewstack.io/prefect-acquires-dagster-orchestrator/, fuente de terceros, consultada 2026-11-16). No cambia los puntajes, pero conviene documentar en el ADR del orquestador por qué se eligió Dagster frente a Airflow. El reporte de dbt Labs "State of Analytics Engineering 2026" (2026-04-14) indica que la confianza y la gobernanza de los datos van por detrás de la adopción de IA (https://www.getdbt.com/resources/state-of-analytics-engineering-2026, encuesta de proveedor); refuerza el valor de testing de datos, pero sin dato de demanda.
+- Limitación: uber.com y getonbrd.com no se pudieron abrir desde el entorno; pendiente verificar el contenido y la fecha de las fuentes primarias y buscar una fuente primaria para Logística y Sensores.
 
 ## Proyectos previos
 
