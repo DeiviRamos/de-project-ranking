@@ -1,6 +1,6 @@
 # Ranking vivo de proyectos
 
-**Proyecto activo:** CDC Retail Orquestado
+**Proyecto activo:** Libro Mayor y Conciliación
 
 **Ejecución:** 2026-11-23 (Δ contra el ranking del 2026-10-07)
 
