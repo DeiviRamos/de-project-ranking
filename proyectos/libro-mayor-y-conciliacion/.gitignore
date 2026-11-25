@@ -1,0 +1,18 @@
+.env
+*.env.local
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.dbt/
+target/
+dbt_packages/
+logs/
+*.log
+pgdata/
+.dagster/
+dagster_home/
+# Datos regenerados con más volumen: no se suben (ver ambiente/README.md)
+ambiente/data-grande/
+.DS_Store

@@ -1,0 +1,16 @@
+codigo_cuenta,nombre,tipo,naturaleza,descripcion
+1101,Banco cuenta corriente,ACTIVO,DEUDORA,Dinero disponible en la cuenta corriente de la empresa.
+1102,Cuentas por cobrar pasarela,ACTIVO,DEUDORA,Pagos con tarjeta aprobados que la pasarela aún no deposita.
+1103,Fondos por confirmar,ACTIVO,DEUDORA,Transferencias informadas por clientes que aún no aparecen en el banco.
+1104,IVA crédito fiscal,ACTIVO,DEUDORA,"IVA pagado en comisiones de proveedores (pasarela, banco)."
+2101,Saldos por pagar a comercios,PASIVO,ACREEDORA,Dinero recaudado que pertenece a los comercios y está pendiente de dispersión.
+2102,IVA débito fiscal,PASIVO,ACREEDORA,IVA incluido en las comisiones cobradas a comercios.
+2103,Reembolsos por pagar,PASIVO,ACREEDORA,Devoluciones aprobadas a compradores aún no ejecutadas.
+3101,Capital,PATRIMONIO,ACREEDORA,Aportes de los socios.
+4101,Ingresos por comisiones,INGRESO,ACREEDORA,Comisión neta de IVA cobrada a los comercios.
+4102,Diferencia de cambio (ganancia),INGRESO,ACREEDORA,Ganancia por conversión de moneda extranjera.
+5101,Gasto comisiones pasarela,GASTO,DEUDORA,Comisión neta cobrada por la pasarela de pago.
+5102,Gasto comisiones bancarias,GASTO,DEUDORA,Cargos del banco por mantención y transferencias.
+5103,Pérdida por contracargos,GASTO,DEUDORA,Montos y cargos por desconocimiento de compras con tarjeta.
+5104,Diferencia de cambio (pérdida),GASTO,DEUDORA,Pérdida por conversión de moneda extranjera.
+5105,Diferencias de conciliación,GASTO,DEUDORA,Diferencias menores aprobadas por contabilidad.
