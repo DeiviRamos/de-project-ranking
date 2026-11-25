@@ -1,0 +1,38 @@
+name: libro-mayor
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?define POSTGRES_USER en .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?define POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: ${POSTGRES_DB:-contabilidad}
+      TZ: UTC
+    ports:
+      - "${PG_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Los archivos de las fuentes quedan visibles (solo lectura) dentro del contenedor en /data
+      - ./data:/data:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  generador:
+    build: ./generador
+    profiles: ["generador"]
+    environment:
+      GEN_SEMILLA: ${GEN_SEMILLA:-42}
+      GEN_DESDE: ${GEN_DESDE:-2026-10-01}
+      GEN_DIAS: ${GEN_DIAS:-30}
+      GEN_MOVS_POR_DIA: ${GEN_MOVS_POR_DIA:-300}
+      GEN_PCT_DEFECTOS: ${GEN_PCT_DEFECTOS:-3}
+      GEN_ESCALA: ${GEN_ESCALA:-1}
+    volumes:
+      - ./data:/salida
+
+volumes:
+  pgdata:
